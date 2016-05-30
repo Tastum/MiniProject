@@ -4,6 +4,7 @@ var life
 var level = 1
 var time
 var co2Niveau = 0
+var preloadText
 
 
 function init(){
@@ -37,7 +38,8 @@ function init(){
 }
 
 function queueProgress(e){
-    preloadText.text= Math.round(e.progress*100)+"%"
+    preloadText.text= Math.round(e.progress*100)+"%";
+    console.log("Progress");
 
 }
 
@@ -50,4 +52,5 @@ function queueComplete(){
 
 function tock(e){
     stage.update(e);
+    console.log("hej hej hej")
 }
