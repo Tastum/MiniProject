@@ -8,12 +8,11 @@ var co2Niveau = 0
 
 function init(){
     stage = new createjs.Stage("canvas");
-    createjs.Ticker.setFPS(30);
-    createjs.Ticker.addEventListener("tick", tock);
+
 
     queue = new createjs.LoadQueue(true);
     preloadText = new createjs.Text("", "50px Courier New", "#000");
-    queue.installPlugin(createjs.Sound)
+    queue.installPlugin(createjs.Sound);
     queue.on("progress", queueProgress);
     queue.on("complete", queueComplete);
     queue.loadManifest([
@@ -39,10 +38,13 @@ function init(){
 
 function queueProgress(e){
     preloadText.text= Math.round(e.progress*100)+"%"
-    stage.update();
+
 }
 
-function queueComplete(){}
+function queueComplete(){
+    createjs.Ticker.addEventListener("tick", tock);
+    createjs.Ticker.setFPS(30);
+}
 
 
 
