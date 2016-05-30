@@ -1,0 +1,17 @@
+Hvad er vores spil?
+ - Single player
+ - Hero (Lille pige eller lille dreng) Vælg din helt.
+ - Liv (3)
+ - Modstands objekter (evil)
+ - Powerups : Speed, liv(+1), skjold, -%co2 udslip.
+ - Aldersgruppe: 8-10 år.
+
+Pointe med spillet:
+Fjern co2 vha. vind energi og sol energi.
+Saml powerups for at hjælpe dig på vej.
+Undgå evil eller du mister et liv.
+Red verden! BE a hero!
+
+Lave sprite med blocks
+
+Få lavet platform 800x600 (Så langt vi når)
