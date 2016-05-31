@@ -13,6 +13,7 @@ var tiles;
 var currentLevel=-1;
 var queue;
 var blockSize = 50;
+var spinner;
 
 var keys = {
     rkd:false,
@@ -24,11 +25,19 @@ var keys = {
 function init(){
     stage = new createjs.Stage("canvas");
     preloadText = new createjs.Text("", "50px Arial", "#000");
-    stage.addChild(preloadText);
+
     preloadText.textBaseline="middle";
     preloadText.textAlign="center";
     preloadText.x=stage.canvas.width/2;
     preloadText.y=stage.canvas.height/2;
+
+    spinner = new createjs.Bitmap("img/spinning.png");
+    spinner.x = 298;
+    spinner.y = 310;
+    spinner.regX=120;
+    spinner.regY=120;
+
+    stage.addChild(spinner, preloadText);
 
     preload()
 }
@@ -39,7 +48,7 @@ function preload(){
     queue.on("progress", queueProgress);
     queue.on("complete", queueComplete);
     queue.loadManifest([
-        //"img/bigPic.jpg",
+        //"img/spinning.png",
         {id:"levelJson",src:"json/levels.json"},
         {id:"bgSound", src:"sounds/bass.mp3"},
         {id:"tiles",src:"json/tiles.json"}
@@ -56,17 +65,14 @@ function queueComplete(){
     createjs.Ticker.addEventListener("tick", tock);
     createjs.Ticker.setFPS(30);
     stage.removeChild(preloadText);
-    bgSound();
+
     console.log('load complete')
     levelData = queue.getResult("levelJson")
     tiles = new createjs.SpriteSheet(queue.getResult("tiles"));
-    setupLevel();
-}
 
     window.addEventListener('keydown', fingerDown);
     window.addEventListener('keyup', fingerUp);
 
-    console.log('Load complete')
 
     var splash = new createjs.Bitmap("img/start.png");
     splash.x=300;
@@ -79,6 +85,9 @@ function queueComplete(){
         }
     );
     stage.addChild(splash);
+
+}
+
 function setupLevel(){
     var row, col;
     currentLevel++;
@@ -159,8 +168,8 @@ function selectHeroType(){
         function(e){
             stage.removeChild(e.target, girl);
             gameIsRunning=true;
+            setupLevel();
             addHero('boy');
-            startGame();
         }
     );
 
@@ -171,8 +180,8 @@ function selectHeroType(){
         function(e){
             stage.removeChild(e.target, boy);
             gameIsRunning=true;
+            setupLevel();
             addHero('girl');
-            startGame();
         }
     );
 
@@ -180,7 +189,7 @@ function selectHeroType(){
 }
 
 function startGame(){
-    muteButton();
+
 }
 
 function resetGame(){
@@ -199,7 +208,7 @@ function addHero(gender) {
     hero.speed = 12;
     hero.x = (stage.canvas.width / 2) - (hero.width / 2);
     hero.y = stage.canvas.height - hero.height;
-    stage.addChild(hero);
+    stage.addChild(hero); //Her stod den oprindeligt!
 }
 
 function moveHero(){
@@ -245,4 +254,5 @@ function tock(e){
     }
     stage.update(e);
     //console.log("Tock is running");
+    spinner.rotation +=1;
 }
