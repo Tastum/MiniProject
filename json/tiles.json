@@ -1,0 +1,11 @@
+{
+
+  "images": ["img/tiles.png"],
+  "frames": {"width":50, "height":50, "regX": 0, "regY":0},
+  "animations": {
+    "grass": [0],
+    "block": [1],
+    "gblock":[2],
+    "windmill":[3]
+  }
+}
