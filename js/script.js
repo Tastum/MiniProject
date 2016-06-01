@@ -14,6 +14,7 @@ var currentLevel=-1;
 var queue;
 var blockSize = 50;
 var spinner;
+var heroSpriteSheet;
 
 var keys = {
     rkd:false,
@@ -48,9 +49,10 @@ function preload(){
     queue.on("progress", queueProgress);
     queue.on("complete", queueComplete);
     queue.loadManifest([
-        //"img/spinning.png",
-        {id: "heroSS", src:"spritesheets/Animations/slime.json"},
-        "spritesheets/Animations/slime-sheet.png",
+        {id: "heroSsBoy", src:"spritesheets/animations/heroSsBoy.json"},
+        {id: "heroSsGirl", src:"spritesheets/animations/heroSsGirl.json"},
+        "spritesheets/animations/hero-boy-sheet.png",
+        "spritesheets/animations/hero-girl-sheet.png",
         {id:"levelJson",src:"json/levels.json"},
         {id:"bgSound", src:"sounds/bass.mp3"},
         {id:"tiles",src:"json/tiles.json"}
@@ -132,15 +134,23 @@ function fingerUp(e){
     //}
     if(e.keyCode===37){
         keys.lkd=false;
+        hero.gotoAndStop('left');
+        hero.currentAnimation = "undefined";
     }
     if(e.keyCode===38){
         keys.ukd=false;
+        hero.gotoAndStop('up');
+        hero.currentAnimation = "undefined";
     }
     if(e.keyCode===39){
         keys.rkd=false;
+        hero.gotoAndStop('right');
+        hero.currentAnimation = "undefined";
     }
     if(e.keyCode===40){
         keys.dkd=false;
+        hero.gotoAndStop('down');
+        hero.currentAnimation = "undefined";
     }
 }
 
@@ -149,15 +159,27 @@ function fingerDown(e){
 
     if(e.keyCode===37){
         keys.lkd=true;
+        if(hero.currentAnimation!='left') {
+            hero.gotoAndPlay('left');
+        }
     }
     if(e.keyCode===38){
         keys.ukd=true;
+        if(hero.currentAnimation!='up') {
+            hero.gotoAndPlay('up');
+        }
     }
     if(e.keyCode===39){
         keys.rkd=true;
+        if(hero.currentAnimation!='right') {
+            hero.gotoAndPlay('right');
+        }
     }
     if(e.keyCode===40){
         keys.dkd=true;
+        if(hero.currentAnimation!='down') {
+            hero.gotoAndPlay('down');
+        }
     }
 }
 
@@ -200,10 +222,12 @@ function resetGame(){
 
 function addHero(gender) {
     if (gender === 'boy'){
-        hero = new createjs.Bitmap("img/boyHero.png");
+        heroSpriteSheet = new createjs.SpriteSheet(queue.getResult('spritesheets/animations/heroSsBoy.json'));
+        hero = new createjs.Sprite(heroSpriteSheet, 'still');
 
     } else {
-        hero = new createjs.Bitmap("img/girlHero.png");
+        heroSpriteSheet = new createjs.SpriteSheet(queue.getResult('spritesheets/animations/heroSsGirl.json'));
+        hero = new createjs.Sprite(heroSpriteSheet, 'still');
     }
     hero.width = 50;
     hero.height = 100;
@@ -223,7 +247,7 @@ function moveHero(){
     if(keys.ukd && hero.y >= 0){
         hero.y-=hero.speed;
     }
-    if(keys.dkd && hero.y < 600-hero.height){
+    if(keys.dkd && hero.y < 650-hero.height){
         hero.y+=hero.speed;
     }
 }
