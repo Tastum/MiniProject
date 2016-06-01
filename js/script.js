@@ -14,6 +14,7 @@ var currentLevel=-1;
 var queue;
 var blockSize = 50;
 var spinner;
+var grid;
 
 var keys = {
     rkd:false,
@@ -89,13 +90,25 @@ function queueComplete(){
     stage.addChild(splash);
 
 }
-
+function isPassable(r, c){
+    switch(grid[r][c].type){
+        case 0:
+            return true;
+            break;
+        case 1:
+            return false;
+            break;
+    }
+}
 function setupLevel(){
+    //stage.removeAllChildren();
     var row, col;
     currentLevel++;
     var level = levelData.levels[currentLevel].tiles;
     //console.log(level);
+    grid=[];
     for(row=0; row<level.length; row++){
+        grid.push([]);
         //console.log(level[row]);
         for(col=0; col<level[row].length; col++){
           console.log(level[row].length)
@@ -119,6 +132,10 @@ function setupLevel(){
             var t = new createjs.Sprite(tiles, img);
             t.x=col*blockSize;
             t.y=row*blockSize;
+            t.row = row;
+            t.col = col;
+            t.type = level[row][col];
+            grid[row].push(t);
             stage.addChild(t);
         }
     }
@@ -208,6 +225,10 @@ function addHero(gender) {
     hero.width = 50;
     hero.height = 100;
     hero.speed = 12;
+    /*if(isPassable(hero.width, hero.height)){
+        hero.x=hero.width*blockSize;
+        hero.y=hero.height*blockSize;
+    }*/
     hero.x = (stage.canvas.width / 2) - (hero.width / 2);
     hero.y = stage.canvas.height - hero.height;
     stage.addChild(hero); //Her stod den oprindeligt!
