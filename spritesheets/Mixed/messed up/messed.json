@@ -1,0 +1,27 @@
+{
+"images": ["messed.png"],
+"frames": [
+
+    [905, 2, 64, 64], 
+    [905, 68, 64, 64], 
+    [905, 134, 64, 64], 
+    [905, 319, 45, 66], 
+    [905, 257, 47, 60], 
+    [2, 2, 901, 458], 
+    [905, 200, 53, 55]
+],
+"animations": {
+    
+        "Wolf3D_89":[0], 
+        "Wolf3D_90":[1], 
+        "Wolf3D_91":[2], 
+        "beedrill":[3], 
+        "golbat":[4], 
+        "landscape":[5], 
+        "skull":[6]
+},
+"texturepacker": [
+        "SmartUpdateHash: $TexturePacker:SmartUpdate:1ab2b2c664ce0bce38a393a8bee38d8f:2e7be0e794ab39b03625ffa67e084171:b0dbbfd0ff8098a44a40d3d7566f2972$",
+        "Created with TexturePacker (http://www.texturepacker.com) for EaselJS"
+]
+}

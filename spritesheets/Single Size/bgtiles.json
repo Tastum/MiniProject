@@ -1,0 +1,17 @@
+{
+
+  "images": ["img/sprites/tiles.png"],
+  "frames": {"width":64, "height":64, "regX": 0, "regY":0},
+  "animations": {
+    "lightStone1": [0],
+    "darkStone1": [1],
+    "key":[2],
+    "darkStone2":[3],
+    "door":[4],
+    "exit":[9],
+    "floor":[19],
+    "keyhole":[43],
+    "water":[73],
+    "space":[28]
+  }
+}

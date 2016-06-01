@@ -49,6 +49,8 @@ function preload(){
     queue.on("complete", queueComplete);
     queue.loadManifest([
         //"img/spinning.png",
+        {id: "heroSS", src:"spritesheets/Animations/slime.json"},
+        "spritesheets/Animations/slime-sheet.png",
         {id:"levelJson",src:"json/levels.json"},
         {id:"bgSound", src:"sounds/bass.mp3"},
         {id:"tiles",src:"json/tiles.json"}
@@ -79,7 +81,7 @@ function queueComplete(){
     splash.y=100;
     splash.addEventListener('click',
         function(e){
-            createjs.Sound.play('bgSound', {loop:-1});
+            //createjs.Sound.play('bgSound', {loop:-1});
             stage.removeChild(e.target);
             selectHeroType();
         }
