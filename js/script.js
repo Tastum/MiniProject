@@ -5,8 +5,8 @@ var hero;
 var life = 3;
 var level = 1;
 var time
-var co2Niveau = 0
-var preloadText, infoText;
+var co2Niveau = 0;
+var preloadText, selectText, deadText;
 var muteButton;
 var levelData;
 var tiles;
@@ -17,7 +17,8 @@ var spinner;
 var heroSpriteSheet;
 var grid;
 var hitTest;
-var smug;
+var smug, statusNow, co2Container;
+
 
 
 var keys = {
@@ -226,7 +227,11 @@ function hitTest(rect1,rect2) {
 
 function selectHeroType(){
 
-
+    var selectText = new createjs.Text("", "40px Arial", "#000");
+    selectText.text = "Select your hero!";
+    selectText.x = 20;
+    selectText.y = 30;
+    stage2.addChild(selectText);
 
 
     var boy = new createjs.Bitmap("img/boyHero.png");
@@ -235,24 +240,24 @@ function selectHeroType(){
     boy.addEventListener('click',
         function(e){
             stage.removeChild(e.target, girl);
-            gameIsRunning=true;
-            setupLevel();
-            addHero('boy');
-            addInfoBar();
-            //stage.removeChild('Infotext');
+            stage2.removeChild(selectText);
+
+            runGame();
+
         }
     );
 
     var girl = new createjs.Bitmap("img/girlHero.png");
-    girl.x=300;
+    girl.x=440;
     girl.y=100;
     girl.addEventListener('click',
         function(e){
             stage.removeChild(e.target, boy);
-            gameIsRunning=true;
-            setupLevel();
-            addHero('girl');
-            addInfoBar();
+            stage2.removeChild(selectText);
+
+            runGame();
+
+
             //stage.removeChild('Infotext');
         }
     );
@@ -268,13 +273,6 @@ function selectHeroType(){
     introText.fillText("",10,50);*/
 }
 
-function startGame(){
-
-}
-
-function resetGame(){
-
-}
 
 function addInfoBar() {
     var factory = new createjs.Bitmap("img/factory.png");
@@ -287,9 +285,7 @@ function addInfoBar() {
     smug.x = 40;
     smug.y = -10;
 
-
-
-    var co2Container = new createjs.Container();
+    co2Container = new createjs.Container();
     co2Container.x = 200;
     co2Container.y = 30;
 
@@ -297,13 +293,36 @@ function addInfoBar() {
     statusBg.graphics.beginFill("green");
     statusBg.graphics.drawRect(0, 0, 400, 40);
 
-    var statusNow = new createjs.Shape();
-    statusNow.graphics.beginFill("red");
-    statusNow.graphics.drawRect(0, 0, 50, 40);
-
-    co2Container.addChild(statusBg, statusNow);
-
     stage2.addChild(factory, smug, co2Container);
+    co2Container.addChild(statusBg);
+
+    statusNow = new createjs.Shape();
+    statusNow.graphics.beginFill("red");
+    co2Container.addChild(statusNow);
+
+
+    statusBar();
+}
+
+function statusBar() {
+    statusNow.graphics.drawRect(0, 0, co2Niveau, 40);
+}
+
+function runGame() {
+    gameIsRunning=true;
+    setupLevel();
+    addHero('girl');
+    addInfoBar();
+
+}
+
+function gameOver() {
+
+        deadText = new createjs.Text("", "60px Arial", "#000");
+        deadText.text = "You're Dead!";
+        deadText.x = 200;
+        deadText.y = 230;
+        stage.addChild(deadText);
 
 }
 
@@ -366,11 +385,18 @@ function muteButton() {
 
 
 function tock(e){
+    if (co2Niveau > 400) {
+        gameIsRunning = false;
+        gameOver();
+    }
     if(gameIsRunning) {
         moveHero();
+        statusBar();
+        co2Niveau +=.1;
     }
     stage.update(e);
     stage2.update(e);
     //console.log("Tock is running");
     spinner.rotation +=1;
+
 }
