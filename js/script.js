@@ -3,10 +3,10 @@ var gameIsRunning = false;
 var stage, stage2;
 var hero;
 var life = 3;
-var wind = 0;
-var sun = 0;
+var windScore = 0;
+var sunScore = 0;
 var level = 1;
-var gameTime = 1;
+var gameTime = 60;
 var co2Niveau = 0;
 var co2Increase = .1;
 var preloadText, deadText;
@@ -19,10 +19,11 @@ var blockSize = 50;
 var spinner;
 var heroSpriteSheet;
 //var grid;
-//var hitTest;
+var hitTest;
 var smug, statusNow, co2Container;
 var smogCloudsRight = [], smogCloudsLeft = [];
 var t;
+var suns = [], wind = [];
 
 var keys = {
     rkd:false,
@@ -119,10 +120,16 @@ function queueComplete(){
 }
 
 function addSun(){
-    var temp = new createjs.Bitmap("img/sun.png");
-    temp.width = 20;
-    temp.height = 20;
-    stage.addChild(temp);
+    var i=0;
+    for (i=0; i<level; i=level) {
+    sun = new createjs.Bitmap("img/sun.png");
+    sun.width = 20;
+        sun.height = 20;
+    stage.addChild(sun);
+        sun.x = Math.random()*stage.canvas.width;
+        sun.y = Math.random()*stage.canvas.height;
+    suns.push(sun);
+    }
 }
 
 function nextLevel() {
@@ -141,6 +148,7 @@ function setupLevel(){
     var level = levelData.levels[currentLevel].tiles;
     //grid=[];
     blocks=[];
+    addSun();
     for(row=0; row<level.length; row++){
        // grid.push([]);
         //console.log(level[row]);
@@ -232,7 +240,27 @@ function fingerDown(e){
     }
 }
 
+function hitTest(rect1,rect2) {
+    if ( rect1.x >= rect2.x + rect2.width
+        || rect1.x + rect1.width <= rect2.x
+        || rect1.y >= rect2.y + rect2.height
+        || rect1.y + rect1.height <= rect2.y )
+    {
+        return false;
+    }
+    return true;
+}
+function sunHit(){
 
+var i=0;
+for (i=0; i<suns.length; i++) {
+    if (hitTest(hero, suns[i])) {
+        stage.removeChild(suns[i]);
+        suns.splice(i, 1);
+        console.log("lol")
+    }
+}
+}
 
 function predictHit(character,rect2) {
     if ( character.nextX >= rect2.x + rect2.width
@@ -357,7 +385,6 @@ function minusCo2() {
 
 function runGame() {
     gameIsRunning=true;
-
     setupLevel();
     addInfoBar();
     addSmogCloudsRight();
@@ -434,8 +461,6 @@ function addHero(gender) {
     hero.x = (stage.canvas.width / 2) - (hero.width / 2);
     hero.y = stage.canvas.height - hero.height;
     stage.addChild(hero); //Her stod den oprindeligt!
-
-
 }
 
 function moveHero(){
@@ -624,6 +649,10 @@ function muteButton() {
             moveSmogCloudsLeft();
             checkCollisions();
             lifestatus();
+            if(Math.floor(Math.random()*200)===15){
+                addSun();
+            }
+            sunHit();
             co2Niveau += co2Increase;
             gameTimeText.text = "Time left: " + +Math.round(gameTime) + " sec";
             lifeText.text = life;
