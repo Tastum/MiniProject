@@ -257,7 +257,7 @@ for (i=0; i<suns.length; i++) {
     if (hitTest(hero, suns[i])) {
         stage.removeChild(suns[i]);
         suns.splice(i, 1);
-        console.log("lol")
+        sunScore++;
     }
 }
 }
@@ -387,8 +387,11 @@ function runGame() {
     gameIsRunning=true;
     setupLevel();
     addInfoBar();
+
+
     addSmogCloudsRight();
     addSmogCloudsLeft();
+
 
     var pollutionText = new createjs.Text("", "20px Arial", "#000");
     pollutionText.text = "Pollution";
@@ -533,6 +536,7 @@ function addSmogCloudsRight() {
         temp.x = 800+temp.width;
         smogCloudsRight.push(temp);
     }
+    console.log("addSmogCloudsRight");
 }
 
 function addSmogCloudsLeft() {
@@ -546,6 +550,7 @@ function addSmogCloudsLeft() {
         temp.x = 800+temp.width;
         smogCloudsLeft.push(temp);
     }
+    console.log("addSmogCloudsLeft");
 }
 
 function moveSmogCloudsRight(){
@@ -574,16 +579,7 @@ function moveSmogCloudsLeft(){
     }
 }
 
-function hitTest(rect1,rect2) {
-    if ( rect1.x >= rect2.x + rect2.width
-        || rect1.x + rect1.width <= rect2.x
-        || rect1.y >= rect2.y + rect2.height
-        || rect1.y + rect1.height <= rect2.y )
-    {
-        return false;
-    }
-    return true;
-}
+
 
 function checkCollisions(){
 
@@ -656,8 +652,8 @@ function muteButton() {
             co2Niveau += co2Increase;
             gameTimeText.text = "Time left: " + +Math.round(gameTime) + " sec";
             lifeText.text = life;
-            windText.text = wind;
-            sunText.text = sun;
+            windText.text = windScore;
+            sunText.text = sunScore;
 
         }
         stage.update(e);
