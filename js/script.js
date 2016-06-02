@@ -23,7 +23,8 @@ var hitTest;
 var smug, statusNow, co2Container;
 var smogCloudsRight = [], smogCloudsLeft = [];
 var t;
-var suns = [], wind = [];
+var suns = [], winds = [];
+var windmill, solar;
 
 var keys = {
     rkd:false,
@@ -96,7 +97,7 @@ function queueComplete(){
     splash.y=100;
     splash.addEventListener('click',
         function(e){
-            //createjs.Sound.play('bgSound', {loop:-1});
+            createjs.Sound.play('bgSound', {loop:-1});
             stage.removeChild(e.target);
             stage.removeChild(introText);
             stage2.removeChild(title);
@@ -132,6 +133,40 @@ function addSun(){
     }
 }
 
+function addWind(){
+    var i=0;
+    for (i=0; i<level; i=level) {
+        wind = new createjs.Bitmap("img/wind.png");
+        wind.width = 20;
+        wind.height = 20;
+        stage.addChild(wind);
+        wind.x = Math.random()*stage.canvas.width;
+        wind.y = Math.random()*stage.canvas.height;
+        winds.push(wind);
+    }
+}
+
+
+
+function addWindmill() {
+    windmill  = new createjs.Bitmap("img/windmill.png");
+    windmill.x=0;
+    windmill.y=100;
+    windmill.height = 50;
+    windmill.width = 50;
+    stage.addChild(windmill);
+}
+
+function addSolar() {
+    solar  = new createjs.Bitmap("img/windmill.png");
+    solar.x=600;
+    solar.y=300;
+    solar.height = 50;
+    solar.width = 50;
+    stage.addChild(solar);
+    
+}
+
 function nextLevel() {
     co2Niveau = 0;
     co2Increase +=.2;
@@ -149,6 +184,7 @@ function setupLevel(){
     //grid=[];
     blocks=[];
     addSun();
+    addWind();
     for(row=0; row<level.length; row++){
        // grid.push([]);
         //console.log(level[row]);
@@ -260,6 +296,17 @@ for (i=0; i<suns.length; i++) {
         sunScore++;
     }
 }
+}
+function windHit(){
+
+    var i=0;
+    for (i=0; i<winds.length; i++) {
+        if (hitTest(hero, winds[i])) {
+        stage.removeChild(winds[i]);
+        winds.splice(i, 1);
+        windScore++;
+        }
+    }
 }
 
 function predictHit(character,rect2) {
@@ -387,11 +434,10 @@ function runGame() {
     gameIsRunning=true;
     setupLevel();
     addInfoBar();
-
-
     addSmogCloudsRight();
     addSmogCloudsLeft();
-
+    addWindmill();
+    addSolar();
 
     var pollutionText = new createjs.Text("", "20px Arial", "#000");
     pollutionText.text = "Pollution";
@@ -536,7 +582,6 @@ function addSmogCloudsRight() {
         temp.x = 800+temp.width;
         smogCloudsRight.push(temp);
     }
-    console.log("addSmogCloudsRight");
 }
 
 function addSmogCloudsLeft() {
@@ -550,7 +595,6 @@ function addSmogCloudsLeft() {
         temp.x = 800+temp.width;
         smogCloudsLeft.push(temp);
     }
-    console.log("addSmogCloudsLeft");
 }
 
 function moveSmogCloudsRight(){
@@ -647,8 +691,10 @@ function muteButton() {
             lifestatus();
             if(Math.floor(Math.random()*200)===15){
                 addSun();
+                addWind();
             }
             sunHit();
+            windHit();
             co2Niveau += co2Increase;
             gameTimeText.text = "Time left: " + +Math.round(gameTime) + " sec";
             lifeText.text = life;
