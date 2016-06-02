@@ -91,27 +91,27 @@ function queueComplete(){
     splash.y=100;
     splash.addEventListener('click',
         function(e){
-            console.log("stat klik");
             //createjs.Sound.play('bgSound', {loop:-1});
             stage.removeChild(e.target);
+            stage.removeChild(introText);
+            stage2.removeChild(title);
             selectHeroType();
         }
     );
     stage.addChild(splash);
 
+    var introText = new createjs.Bitmap("img/introText.png");
+    introText.x = 50;
+    introText.y = 350;
+    stage.addChild(introText);
+
+    var title = new createjs.Bitmap("img/title.png");
+    title.x = 200;
+    title.y = -20;
+    stage2.addChild(title);
 
 
-}
 
-function isPassable(r, c){
-    switch(grid[r][c].type){
-        case 0:
-            return true;
-            break;
-        case 1:
-            return false;
-            break;
-    }
 }
 
 function nextLevel() {
@@ -125,14 +125,12 @@ function setupLevel(){
     var row, col;
     currentLevel++;
     var level = levelData.levels[currentLevel].tiles;
-    //console.log(level);
     //grid=[];
     blocks=[];
     for(row=0; row<level.length; row++){
        // grid.push([]);
         //console.log(level[row]);
         for(col=0; col<level[row].length; col++){
-          //console.log(level[row].length)
             var img;
             switch(level[row][col]){
                 case 0:
@@ -163,8 +161,6 @@ function setupLevel(){
             stage.addChild(t);
         }
     }
-    /*var t = new createjs.Sprite(tiles, "block");
-    stage.addChild(t);*/
 }
 
 function fingerUp(e){
@@ -280,12 +276,6 @@ function selectHeroType(){
 
     stage.addChild(boy, girl);
 
-    //infoText = new createjs.Text("", "50px Arial", "#000");
-    //infoText.textBaseline="middle";
-    //infoText.textAlign="center";
-    //infoText.x=stage.canvas.width/2;
-    //infoText.y=stage.canvas.height/2;
-    //infoText.text="The evil factory is polluting the world. You must collect the energy and bring it to the windmill or sunpanel to prevent the world from going under. Use the arrow keys to navigate through the levels but beware of the evil workers that are lurking around.";
 }
 
 function addInfoBar() {
@@ -317,11 +307,26 @@ function addInfoBar() {
     statusNow.graphics.beginFill("red");
     co2Container.addChild(statusNow);
 
+    var heart = new createjs.Bitmap("img/life.png");
+    heart.x = 700;
+    heart.y = 10;
+    stage2.addChild(heart);
+
+    var windScore = new createjs.Bitmap("img/wind.png");
+    windScore.x = 680;
+    windScore.y = 30;
+    stage2.addChild(windScore);
+
+    var sunScore = new createjs.Bitmap("img/sun.png");
+    sunScore.x = 700;
+    sunScore.y = 50;
+    stage2.addChild(sunScore);
+
+
     statusBar();
 }
 
 function statusBar() {
-
     statusNow.graphics.drawRect(0, 0, co2Niveau, 40);
 
 }
@@ -395,10 +400,9 @@ function addHero(gender) {
     hero.speed = 10;
     hero.nextX;
     hero.nextY;
-    /*if(isPassable(hero.width, hero.height)){
-        hero.x=hero.width*blockSize;
-        hero.y=hero.height*blockSize;
-    }*/
+    //hero.sun = 0;
+    //hero.wind = 0;
+
     hero.x = (stage.canvas.width / 2) - (hero.width / 2);
     hero.y = stage.canvas.height - hero.height;
     stage.addChild(hero); //Her stod den oprindeligt!
@@ -423,7 +427,7 @@ function moveHero(){
     if(keys.lkd && hero.x > 0){
         var collisionDetected = false;
         hero.nextY=hero.y;
-        hero.nextX=hero.x+hero.speed;
+        hero.nextX=hero.x-hero.speed;
         for(i=0; i<blocks.length; i++){
             if(predictHit(hero, blocks[i])){
                 collisionDetected=true;
@@ -436,7 +440,7 @@ function moveHero(){
     }
     if(keys.ukd && hero.y >= 0){
         var collisionDetected = false;
-        hero.nextY=hero.y+hero.speed;
+        hero.nextY=hero.y-hero.speed;
         hero.nextX=hero.x;
         for(i=0; i<blocks.length; i++){
             if(predictHit(hero, blocks[i])){
@@ -473,38 +477,35 @@ function muteButton() {
     muteButton.y = 50;
 
     muteButton.addEventListener('click',
-        function(e){
+        function (e) {
             //createjs.Sound.muted = true;
         }
     );
 
+
     stage.addChild(muteButton);
 
-
-
 }
+    function tock(e) {
+        if (co2Niveau > 400) {
+            gameIsRunning = false;
+            gameOver();
+        }
+        if (gameIsRunning === true)
+            if (gameTime > 0) {
+                gameTime -= .025;
 
-
-function tock(e){
-    if (co2Niveau > 400) {
-        gameIsRunning = false;
-        gameOver();
+            } else {
+                youWin();
+            }
+        if (gameIsRunning === true) {
+            moveHero();
+            statusBar();
+            co2Niveau += co2Increase;
+            gameTimeText.text = "Time left: " + +Math.round(gameTime) + " sec";
+        }
+        stage.update(e);
+        stage2.update(e);
+        //console.log("Tock is running");
+        spinner.rotation += 1;
     }
-    if (gameIsRunning===true)
-    if (gameTime > 0) {
-        gameTime -= .025;
-
-    } else {
-        youWin();
-    }
-    if(gameIsRunning===true) {
-        moveHero();
-        statusBar();
-        co2Niveau +=co2Increase;
-        gameTimeText.text = "Time left: " +  + Math.round(gameTime) + " sec";
-    }
-    stage.update(e);
-    stage2.update(e);
-    //console.log("Tock is running");
-    spinner.rotation +=1;
-}
