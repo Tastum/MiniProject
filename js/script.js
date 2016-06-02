@@ -1,12 +1,12 @@
 var autoStart = true;
 var gameIsRunning = false;
-var stage;
+var stage, stage2;
 var hero;
-var life
+var life = 3;
 var level = 1;
 var time
 var co2Niveau = 0
-var preloadText
+var preloadText, infoText;
 var muteButton;
 var levelData;
 var tiles;
@@ -14,8 +14,12 @@ var currentLevel=-1;
 var queue;
 var blockSize = 50;
 var spinner;
+var heroSpriteSheet;
 var grid;
 var hitTest;
+var smug;
+
+
 
 var keys = {
     rkd:false,
@@ -26,8 +30,9 @@ var keys = {
 
 function init(){
     stage = new createjs.Stage("canvas");
-    preloadText = new createjs.Text("", "50px Arial", "#000");
+    stage2 = new createjs.Stage("canvasInfo");
 
+    preloadText = new createjs.Text("", "50px Arial", "#000");
     preloadText.textBaseline="middle";
     preloadText.textAlign="center";
     preloadText.x=stage.canvas.width/2;
@@ -50,9 +55,14 @@ function preload(){
     queue.on("progress", queueProgress);
     queue.on("complete", queueComplete);
     queue.loadManifest([
-        //"img/spinning.png",
-        {id: "heroSS", src:"spritesheets/Animations/slime.json"},
-        "spritesheets/Animations/slime-sheet.png",
+        {id: "heroSsBoy", src:"spritesheets/animations/heroSsBoy.json"},
+        {id: "heroSsGirl", src:"spritesheets/animations/heroSsGirl.json"},
+        {id:}
+        {id: "smug", src:"spritesheets/animations/smug.json"},
+        "spritesheets/animations/hero-boy-sheet.png",
+        "spritesheets/animations/hero-girl-sheet.png",
+        "img/factory.png",
+        "img/smug.png",
         {id:"levelJson",src:"json/levels.json"},
         {id:"bgSound", src:"sounds/bass.mp3"},
         {id:"tiles",src:"json/tiles.json"}
@@ -66,7 +76,7 @@ function queueProgress(e){
 }
 
 function queueComplete(){
-    createjs.Ticker.addEventListener("tick", tock);
+    createjs.Ticker.on("tick", tock);
     createjs.Ticker.setFPS(30);
     stage.removeChild(preloadText);
 
@@ -90,6 +100,8 @@ function queueComplete(){
     );
     stage.addChild(splash);
 
+
+
 }
 function isPassable(r, c){
     switch(grid[r][c].type){
@@ -100,20 +112,6 @@ function isPassable(r, c){
             return false;
             break;
     }
-}
-
-function checkCollisions(){
-
-}
-function hitTest(rect1,rect2) {
-    if ( rect1.x >= rect2.x + rect2.width
-        || rect1.x + rect1.width <= rect2.x
-        || rect1.y >= rect2.y + rect2.height
-        || rect1.y + rect1.height <= rect2.y)
-    {
-        return false;
-    }
-    return true;
 }
 
 function setupLevel(){
@@ -127,7 +125,7 @@ function setupLevel(){
         grid.push([]);
         //console.log(level[row]);
         for(col=0; col<level[row].length; col++){
-          console.log(level[row].length)
+          //console.log(level[row].length)
             var img;
             switch(level[row][col]){
                 case 0:
@@ -165,15 +163,23 @@ function fingerUp(e){
     //}
     if(e.keyCode===37){
         keys.lkd=false;
+        hero.gotoAndStop('left');
+        hero.currentAnimation = "undefined";
     }
     if(e.keyCode===38){
         keys.ukd=false;
+        hero.gotoAndStop('up');
+        hero.currentAnimation = "undefined";
     }
     if(e.keyCode===39){
         keys.rkd=false;
+        hero.gotoAndStop('right');
+        hero.currentAnimation = "undefined";
     }
     if(e.keyCode===40){
         keys.dkd=false;
+        hero.gotoAndStop('down');
+        hero.currentAnimation = "undefined";
     }
 }
 
@@ -182,19 +188,68 @@ function fingerDown(e){
 
     if(e.keyCode===37){
         keys.lkd=true;
+        if(hero.currentAnimation!='left') {
+            hero.gotoAndPlay('left');
+        }
     }
     if(e.keyCode===38){
         keys.ukd=true;
+        if(hero.currentAnimation!='up') {
+            hero.gotoAndPlay('up');
+        }
     }
     if(e.keyCode===39){
         keys.rkd=true;
+        if(hero.currentAnimation!='right') {
+            hero.gotoAndPlay('right');
+        }
     }
     if(e.keyCode===40){
         keys.dkd=true;
+        if(hero.currentAnimation!='down') {
+            hero.gotoAndPlay('down');
+        }
+    }
+}
+
+function hitTest(rect1,rect2) {
+    if ( rect1.x >= rect2.x + rect2.width
+        || rect1.x + rect1.width <= rect2.x
+        || rect1.y >= rect2.y + rect2.height
+        || rect1.y + rect1.height <= rect2.y )
+    {
+        return false;
+    }
+    return true;
+}
+
+function checkCollisions(){
+
+    var i=0;
+    for(; i<level; i++){
+        if(hitTest(astronaut, aliens1[i])){
+            gameIsRunning = false;
+            dead();
+        }
+        if(hitTest(astronaut, aliens2[i])){
+            gameIsRunning = false;
+            dead();
+        }
+        if(hitTest(astronaut, meteors1[i])){
+            gameIsRunning = false;
+            dead();
+        }
+        if(hitTest(astronaut, meteors2[i])){
+            gameIsRunning = false;
+            dead();
+        }
     }
 }
 
 function selectHeroType(){
+
+
+
 
     var boy = new createjs.Bitmap("img/boyHero.png");
     boy.x=100;
@@ -205,6 +260,8 @@ function selectHeroType(){
             gameIsRunning=true;
             setupLevel();
             addHero('boy');
+            addInfoBar();
+            //stage.removeChild('Infotext');
         }
     );
 
@@ -217,10 +274,20 @@ function selectHeroType(){
             gameIsRunning=true;
             setupLevel();
             addHero('girl');
+            addInfoBar();
+            //stage.removeChild('Infotext');
         }
     );
 
     stage.addChild(boy, girl);
+
+    preloadText.text="The evil factory is polluting the world. You must collect the energy and bring it to the windmill or sunpanel to prevent the world from going under. Use the arrow keys to navigate through the levels but beware of the evil workers that are lurking around.";
+
+    /*var canvas = document.getElementById("");
+    var introText = new createjs.t
+    var introText = canvas.getContext("2d");
+    introText.font = "30px Arial";
+    introText.fillText("",10,50);*/
 }
 
 function startGame(){
@@ -231,12 +298,29 @@ function resetGame(){
 
 }
 
+function addInfoBar() {
+    var factory = new createjs.Bitmap("img/factory.png");
+    factory.x=10;
+    factory.y=0;
+    stage2.addChild(factory);
+
+    var smugSheet = new createjs.SpriteSheet(queue.getResult('spritesheets/animations/smug.json'));
+    smug = new createjs.Sprite(smugSheet, 'run');
+    smug.x = 100;
+    smug.y = 0;
+
+    stage2.addChild(smug);
+
+}
+
 function addHero(gender) {
     if (gender === 'boy'){
-        hero = new createjs.Bitmap("img/boyHero.png");
+        heroSpriteSheet = new createjs.SpriteSheet(queue.getResult('spritesheets/animations/heroSsBoy.json'));
+        hero = new createjs.Sprite(heroSpriteSheet, 'still');
 
     } else {
-        hero = new createjs.Bitmap("img/girlHero.png");
+        heroSpriteSheet = new createjs.SpriteSheet(queue.getResult('spritesheets/animations/heroSsGirl.json'));
+        hero = new createjs.Sprite(heroSpriteSheet, 'still');
     }
     hero.width = 50;
     hero.height = 100;
@@ -260,7 +344,7 @@ function moveHero(){
     if(keys.ukd && hero.y >= 0){
         hero.y-=hero.speed;
     }
-    if(keys.dkd && hero.y < 600-hero.height){
+    if(keys.dkd && hero.y < 650-hero.height){
         hero.y+=hero.speed;
     }
 }
@@ -292,6 +376,7 @@ function tock(e){
         moveHero();
     }
     stage.update(e);
+    stage2.update(e);
     //console.log("Tock is running");
     spinner.rotation +=1;
 }
