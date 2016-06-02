@@ -4,8 +4,9 @@ var stage, stage2;
 var hero;
 var life = 3;
 var level = 1;
-var time
+var gameTime = 60;
 var co2Niveau = 0;
+var co2Increase = .1;
 var preloadText, selectText, deadText;
 var muteButton;
 var levelData;
@@ -18,8 +19,6 @@ var heroSpriteSheet;
 //var grid;
 var hitTest;
 var smug, statusNow, co2Container;
-
-
 
 var keys = {
     rkd:false,
@@ -92,6 +91,7 @@ function queueComplete(){
     splash.y=100;
     splash.addEventListener('click',
         function(e){
+            console.log("stat klik");
             //createjs.Sound.play('bgSound', {loop:-1});
             stage.removeChild(e.target);
             selectHeroType();
@@ -114,8 +114,14 @@ function isPassable(r, c){
     }
 }
 
+function nextLevel() {
+    co2Niveau = 0;
+    co2Increase +=.2;
+    setupLevel();
+}
+
 function setupLevel(){
-    //stage.removeAllChildren();
+    stage.removeAllChildren();
     var row, col;
     currentLevel++;
     var level = levelData.levels[currentLevel].tiles;
@@ -238,8 +244,6 @@ function predictHit(character,rect2) {
     return true;
 }
 
-
-
 function selectHeroType(){
 
     var selectText = new createjs.Text("", "40px Arial", "#000");
@@ -248,7 +252,6 @@ function selectHeroType(){
     selectText.y = 30;
     stage2.addChild(selectText);
 
-
     var boy = new createjs.Bitmap("img/boyHero.png");
     boy.x=100;
     boy.y=100;
@@ -256,8 +259,7 @@ function selectHeroType(){
         function(e){
             stage.removeChild(e.target, girl);
             stage2.removeChild(selectText);
-
-            runGame();
+            addHero('boy');
 
         }
     );
@@ -269,8 +271,7 @@ function selectHeroType(){
         function(e){
             stage.removeChild(e.target, boy);
             stage2.removeChild(selectText);
-
-            runGame();
+            addHero('girl');
 
 
             //stage.removeChild('Infotext');
@@ -286,7 +287,6 @@ function selectHeroType(){
     //infoText.y=stage.canvas.height/2;
     //infoText.text="The evil factory is polluting the world. You must collect the energy and bring it to the windmill or sunpanel to prevent the world from going under. Use the arrow keys to navigate through the levels but beware of the evil workers that are lurking around.";
 }
-
 
 function addInfoBar() {
     var factory = new createjs.Bitmap("img/factory.png");
@@ -312,35 +312,76 @@ function addInfoBar() {
 
     statusNow = new createjs.Shape();
     statusNow.graphics.beginFill("red");
-    co2Container.addChild(statusNow);
 
+    statusNow = new createjs.Shape();
+    statusNow.graphics.beginFill("red");
+    co2Container.addChild(statusNow);
 
     statusBar();
 }
 
 function statusBar() {
+
     statusNow.graphics.drawRect(0, 0, co2Niveau, 40);
+
+}
+
+function minusCo2() {
+    co2Niveau -=20;
 }
 
 function runGame() {
     gameIsRunning=true;
     setupLevel();
-    addHero('girl');
     addInfoBar();
 
+    var pollutionText = new createjs.Text("", "20px Arial", "#000");
+    pollutionText.text = "Pollution";
+    pollutionText.x = 300;
+    pollutionText.y = 40;
+    stage2.addChild(pollutionText);
+
+    gameTimeText = new createjs.Text("", "18px Arial", "#000");
+    gameTimeText.text = "Time left: " + gameTime + " sek";
+    gameTimeText.x = 450;
+    gameTimeText.y = 75;
+    stage2.addChild(gameTimeText);
+}
+
+function youWin() {
+    var youWinText = new createjs.Text("", "60px Arial", "#000");
+    youWinText.text = "Level up!";
+    youWinText.x = 280;
+    youWinText.y = 230;
+    gameTime = 60;
+    stage.addChild(youWinText);
+
+    setTimeout(function() { nextLevel(); }, 2000);
 }
 
 function gameOver() {
 
-        deadText = new createjs.Text("", "60px Arial", "#000");
-        deadText.text = "You're Dead!";
-        deadText.x = 200;
-        deadText.y = 230;
-        stage.addChild(deadText);
+    deadText = new createjs.Text("", "60px Arial", "#000");
+    deadText.text = "You're Dead!";
+    deadText.x = 230;
+    deadText.y = 130;
+
+
+    var splash = new createjs.Bitmap("img/replay.png");
+    splash.x=250;
+    splash.y=200;
+    splash.addEventListener('click',
+        function(e){
+            location.reload();
+        }
+    );
+    stage.addChild(deadText, splash);
+
 
 }
 
 function addHero(gender) {
+    runGame();
     if (gender === 'boy'){
         heroSpriteSheet = new createjs.SpriteSheet(queue.getResult('spritesheets/animations/heroSsBoy.json'));
         hero = new createjs.Sprite(heroSpriteSheet, 'still');
@@ -444,16 +485,23 @@ function muteButton() {
 }
 
 
-
 function tock(e){
     if (co2Niveau > 400) {
         gameIsRunning = false;
         gameOver();
     }
-    if(gameIsRunning) {
+    if (gameIsRunning===true)
+    if (gameTime > 0) {
+        gameTime -= .025;
+
+    } else {
+        youWin();
+    }
+    if(gameIsRunning===true) {
         moveHero();
         statusBar();
-        co2Niveau +=.1;
+        co2Niveau +=co2Increase;
+        gameTimeText.text = "Time left: " +  + Math.round(gameTime) + " sec";
     }
     stage.update(e);
     stage2.update(e);
