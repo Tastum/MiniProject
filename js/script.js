@@ -158,7 +158,7 @@ function addWindmill() {
 }
 
 function addSolar() {
-    solar  = new createjs.Bitmap("img/windmill.png");
+    solar  = new createjs.Bitmap("img/solCelle.png");
     solar.x=600;
     solar.y=300;
     solar.height = 50;
@@ -286,6 +286,37 @@ function hitTest(rect1,rect2) {
     }
     return true;
 }
+
+function windmillHit() {
+    var i = 0;
+    for (; i < level; i++) {
+
+        if (hitTest(hero, windmill)) {
+                if (windScore >0) {
+                    minusCo2();
+                    windScore--;
+                }
+        }
+
+    }
+}
+
+function solarHit() {
+    var i = 0;
+    for (; i < level; i++) {
+
+        if (hitTest(hero, solar)) {
+            if (sunScore >0) {
+                minusCo2();
+                sunScore--;
+            }
+
+        }
+
+    }
+
+}
+
 function sunHit(){
 
 var i=0;
@@ -688,6 +719,8 @@ function muteButton() {
             moveSmogCloudsRight();
             moveSmogCloudsLeft();
             checkCollisions();
+            windmillHit();
+            solarHit();
             lifestatus();
             if(Math.floor(Math.random()*200)===15){
                 addSun();
