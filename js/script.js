@@ -16,7 +16,6 @@ var blockSize = 50;
 var spinner;
 var heroSpriteSheet;
 var grid;
-var smug;
 
 
 var keys = {
@@ -56,8 +55,8 @@ function preload(){
         {id: "heroSsBoy", src:"spritesheets/animations/heroSsBoy.json"},
         {id: "heroSsGirl", src:"spritesheets/animations/heroSsGirl.json"},
         {id: "smug", src:"spritesheets/animations/smug.json"},
-        "spritesheets/animations/hero-boy-sheet.png",
-        "spritesheets/animations/hero-girl-sheet.png",
+        "img/hero-boy-sheet.png",
+        "img/hero-girl-sheet.png",
         "img/factory.png",
         "img/smug.png",
         {id:"levelJson",src:"json/levels.json"},
@@ -219,28 +218,7 @@ function hitTest(rect1,rect2) {
     return true;
 }
 
-function checkCollisions(){
 
-    var i=0;
-    for(; i<level; i++){
-        if(hitTest(astronaut, aliens1[i])){
-            gameIsRunning = false;
-            dead();
-        }
-        if(hitTest(astronaut, aliens2[i])){
-            gameIsRunning = false;
-            dead();
-        }
-        if(hitTest(astronaut, meteors1[i])){
-            gameIsRunning = false;
-            dead();
-        }
-        if(hitTest(astronaut, meteors2[i])){
-            gameIsRunning = false;
-            dead();
-        }
-    }
-}
 
 function selectHeroType(){
 
@@ -290,14 +268,29 @@ function addInfoBar() {
     var factory = new createjs.Bitmap("img/factory.png");
     factory.x=10;
     factory.y=0;
-    stage2.addChild(factory);
 
-    var smugSheet = new createjs.SpriteSheet(queue.getResult('spritesheets/animations/smug.json'));
+    var smugSheet = new createjs.SpriteSheet(queue.getResult('smug'));
     smug = new createjs.Sprite(smugSheet, 'run');
-    smug.x = 100;
-    smug.y = 0;
+    smug.x = 40;
+    smug.y = -10;
 
-    stage2.addChild(smug);
+
+
+    var co2Container = new createjs.Container();
+    co2Container.x = 200;
+    co2Container.y = 30;
+
+    var statusBg = new createjs.Shape();
+    statusBg.graphics.beginFill("green");
+    statusBg.graphics.drawRect(0, 0, 400, 40);
+
+    var statusNow = new createjs.Shape();
+    statusNow.graphics.beginFill("red");
+    statusNow.graphics.drawRect(0, 0, 50, 40);
+
+    co2Container.addChild(statusBg, statusNow);
+
+    stage2.addChild(factory, smug, co2Container);
 
 }
 
