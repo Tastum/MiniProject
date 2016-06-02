@@ -23,7 +23,7 @@ var hitTest;
 var smug, statusNow, co2Container;
 var smogCloudsRight = [], smogCloudsLeft = [];
 var t;
-var suns = [], wind = [];
+var suns = [], winds = [];
 
 var keys = {
     rkd:false,
@@ -132,6 +132,19 @@ function addSun(){
     }
 }
 
+function addWind(){
+    var i=0;
+    for (i=0; i<level; i=level) {
+        wind = new createjs.Bitmap("img/wind.png");
+        wind.width = 20;
+        wind.height = 20;
+        stage.addChild(wind);
+        wind.x = Math.random()*stage.canvas.width;
+        wind.y = Math.random()*stage.canvas.height;
+        winds.push(wind);
+    }
+}
+
 function nextLevel() {
     co2Niveau = 0;
     co2Increase +=.2;
@@ -149,6 +162,7 @@ function setupLevel(){
     //grid=[];
     blocks=[];
     addSun();
+    addWind();
     for(row=0; row<level.length; row++){
        // grid.push([]);
         //console.log(level[row]);
@@ -257,9 +271,20 @@ for (i=0; i<suns.length; i++) {
     if (hitTest(hero, suns[i])) {
         stage.removeChild(suns[i]);
         suns.splice(i, 1);
-        console.log("lol")
+        sunScore++;
     }
 }
+}
+function windHit(){
+
+    var i=0;
+    for (i=0; i<winds.length; i++) {
+        if (hitTest(hero, winds[i])) {
+        stage.removeChild(winds[i]);
+        winds.splice(i, 1);
+        windScore++;
+        }
+    }
 }
 
 function predictHit(character,rect2) {
@@ -574,17 +599,6 @@ function moveSmogCloudsLeft(){
     }
 }
 
-function hitTest(rect1,rect2) {
-    if ( rect1.x >= rect2.x + rect2.width
-        || rect1.x + rect1.width <= rect2.x
-        || rect1.y >= rect2.y + rect2.height
-        || rect1.y + rect1.height <= rect2.y )
-    {
-        return false;
-    }
-    return true;
-}
-
 function checkCollisions(){
 
     var i=0;
@@ -651,8 +665,10 @@ function muteButton() {
             lifestatus();
             if(Math.floor(Math.random()*200)===15){
                 addSun();
+                addWind();
             }
             sunHit();
+            windHit();
             co2Niveau += co2Increase;
             gameTimeText.text = "Time left: " + +Math.round(gameTime) + " sec";
             lifeText.text = life;
