@@ -15,3 +15,14 @@ Red verden! BE a hero!
 Lave sprite med blocks
 
 Få lavet platform 800x600 (Så langt vi når)
+
+Ting der er fastslået:
+
+Platform - ser oppefra.
+Skal samle sol/vind nøgler
+Skal afleveres i vindmølle eller solpanel.
+Bliver jaget af onde mænd.
+Bloke der fohindrer.
+Powerups der hjælper.
+
+Inspiration : Playing with fire, Pac-Man.

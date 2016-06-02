@@ -1,0 +1,5 @@
+The evil factory is polluting the world.
+You must collect the energy and bring it to the windmill
+or sunpanel to prevent the world from going under.
+Use the arrow keys to navigate through the levels
+but beware of the evil workers that are lurking around.

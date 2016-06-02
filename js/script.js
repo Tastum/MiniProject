@@ -16,6 +16,8 @@ var blockSize = 50;
 var spinner;
 var heroSpriteSheet;
 var grid;
+var hitTest;
+var smug;
 
 
 var keys = {
@@ -99,6 +101,7 @@ function queueComplete(){
 
 
 }
+
 function isPassable(r, c){
     switch(grid[r][c].type){
         case 0:
@@ -109,6 +112,7 @@ function isPassable(r, c){
             break;
     }
 }
+
 function setupLevel(){
     //stage.removeAllChildren();
     var row, col;
@@ -254,6 +258,14 @@ function selectHeroType(){
     );
 
     stage.addChild(boy, girl);
+
+    preloadText.text="The evil factory is polluting the world. You must collect the energy and bring it to the windmill or sunpanel to prevent the world from going under. Use the arrow keys to navigate through the levels but beware of the evil workers that are lurking around.";
+
+    /*var canvas = document.getElementById("");
+    var introText = new createjs.t
+    var introText = canvas.getContext("2d");
+    introText.font = "30px Arial";
+    introText.fillText("",10,50);*/
 }
 
 function startGame(){
@@ -268,6 +280,7 @@ function addInfoBar() {
     var factory = new createjs.Bitmap("img/factory.png");
     factory.x=10;
     factory.y=0;
+    
 
     var smugSheet = new createjs.SpriteSheet(queue.getResult('smug'));
     smug = new createjs.Sprite(smugSheet, 'run');
