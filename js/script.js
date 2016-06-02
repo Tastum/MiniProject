@@ -24,6 +24,7 @@ var smug, statusNow, co2Container;
 var smogCloudsRight = [], smogCloudsLeft = [];
 var t;
 var suns = [], winds = [];
+var windmill, solar;
 
 var keys = {
     rkd:false,
@@ -96,7 +97,7 @@ function queueComplete(){
     splash.y=100;
     splash.addEventListener('click',
         function(e){
-            //createjs.Sound.play('bgSound', {loop:-1});
+            createjs.Sound.play('bgSound', {loop:-1});
             stage.removeChild(e.target);
             stage.removeChild(introText);
             stage2.removeChild(title);
@@ -143,6 +144,27 @@ function addWind(){
         wind.y = Math.random()*stage.canvas.height;
         winds.push(wind);
     }
+}
+
+
+
+function addWindmill() {
+    windmill  = new createjs.Bitmap("img/windmill.png");
+    windmill.x=0;
+    windmill.y=100;
+    windmill.height = 50;
+    windmill.width = 50;
+    stage.addChild(windmill);
+}
+
+function addSolar() {
+    solar  = new createjs.Bitmap("img/windmill.png");
+    solar.x=600;
+    solar.y=300;
+    solar.height = 50;
+    solar.width = 50;
+    stage.addChild(solar);
+    
 }
 
 function nextLevel() {
@@ -414,6 +436,8 @@ function runGame() {
     addInfoBar();
     addSmogCloudsRight();
     addSmogCloudsLeft();
+    addWindmill();
+    addSolar();
 
     var pollutionText = new createjs.Text("", "20px Arial", "#000");
     pollutionText.text = "Pollution";
@@ -599,6 +623,8 @@ function moveSmogCloudsLeft(){
     }
 }
 
+
+
 function checkCollisions(){
 
     var i=0;
@@ -672,8 +698,8 @@ function muteButton() {
             co2Niveau += co2Increase;
             gameTimeText.text = "Time left: " + +Math.round(gameTime) + " sec";
             lifeText.text = life;
-            windText.text = wind;
-            sunText.text = sun;
+            windText.text = windScore;
+            sunText.text = sunScore;
 
         }
         stage.update(e);
