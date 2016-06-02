@@ -15,7 +15,7 @@ var queue;
 var blockSize = 50;
 var spinner;
 var heroSpriteSheet;
-var grid;
+//var grid;
 var hitTest;
 var smug, statusNow, co2Container;
 
@@ -120,9 +120,10 @@ function setupLevel(){
     currentLevel++;
     var level = levelData.levels[currentLevel].tiles;
     //console.log(level);
-    grid=[];
+    //grid=[];
+    blocks=[];
     for(row=0; row<level.length; row++){
-        grid.push([]);
+       // grid.push([]);
         //console.log(level[row]);
         for(col=0; col<level[row].length; col++){
           //console.log(level[row].length)
@@ -146,10 +147,13 @@ function setupLevel(){
             var t = new createjs.Sprite(tiles, img);
             t.x=col*blockSize;
             t.y=row*blockSize;
-            t.row = row;
-            t.col = col;
+            t.width=blockSize;
+            t.height=blockSize;
             t.type = level[row][col];
-            grid[row].push(t);
+            if(t.type===1){
+                blocks.push(t);
+            }
+         //   grid[row].push(t);
             stage.addChild(t);
         }
     }
@@ -223,6 +227,17 @@ function hitTest(rect1,rect2) {
     return true;
 }
 
+function predictHit(character,rect2) {
+    if ( character.nextX >= rect2.x + rect2.width
+        || character.nextX + character.width <= rect2.x
+        || character.nextY >= rect2.y + rect2.height
+        || character.nextY + character.height <= rect2.y )
+    {
+        return false;
+    }
+    return true;
+}
+
 
 
 function selectHeroType(){
@@ -264,13 +279,12 @@ function selectHeroType(){
 
     stage.addChild(boy, girl);
 
-    preloadText.text="The evil factory is polluting the world. You must collect the energy and bring it to the windmill or sunpanel to prevent the world from going under. Use the arrow keys to navigate through the levels but beware of the evil workers that are lurking around.";
-
-    /*var canvas = document.getElementById("");
-    var introText = new createjs.t
-    var introText = canvas.getContext("2d");
-    introText.font = "30px Arial";
-    introText.fillText("",10,50);*/
+    //infoText = new createjs.Text("", "50px Arial", "#000");
+    //infoText.textBaseline="middle";
+    //infoText.textAlign="center";
+    //infoText.x=stage.canvas.width/2;
+    //infoText.y=stage.canvas.height/2;
+    //infoText.text="The evil factory is polluting the world. You must collect the energy and bring it to the windmill or sunpanel to prevent the world from going under. Use the arrow keys to navigate through the levels but beware of the evil workers that are lurking around.";
 }
 
 
@@ -336,8 +350,10 @@ function addHero(gender) {
         hero = new createjs.Sprite(heroSpriteSheet, 'still');
     }
     hero.width = 50;
-    hero.height = 100;
-    hero.speed = 12;
+    hero.height = 50;
+    hero.speed = 10;
+    hero.nextX;
+    hero.nextY;
     /*if(isPassable(hero.width, hero.height)){
         hero.x=hero.width*blockSize;
         hero.y=hero.height*blockSize;
@@ -349,16 +365,61 @@ function addHero(gender) {
 
 function moveHero(){
     if(keys.rkd && hero.x < 800-hero.width){
-        hero.x+=hero.speed;
+        var collisionDetected = false;
+        hero.nextY=hero.y;
+        hero.nextX=hero.x+hero.speed;
+        for(i=0; i<blocks.length; i++){
+            if(predictHit(hero, blocks[i])){
+                console.log("hit predicted");
+                collisionDetected=true;
+                break;
+            }
+        }
+        if(!collisionDetected) {
+            hero.x += hero.speed;
+        }
     }
     if(keys.lkd && hero.x > 0){
-        hero.x-=hero.speed;
+        var collisionDetected = false;
+        hero.nextY=hero.y;
+        hero.nextX=hero.x+hero.speed;
+        for(i=0; i<blocks.length; i++){
+            if(predictHit(hero, blocks[i])){
+                collisionDetected=true;
+                break;
+            }
+        }
+        if(!collisionDetected) {
+            hero.x -= hero.speed;
+        }
     }
     if(keys.ukd && hero.y >= 0){
-        hero.y-=hero.speed;
+        var collisionDetected = false;
+        hero.nextY=hero.y+hero.speed;
+        hero.nextX=hero.x;
+        for(i=0; i<blocks.length; i++){
+            if(predictHit(hero, blocks[i])){
+                collisionDetected=true;
+                break;
+            }
+        }
+        if(!collisionDetected) {
+            hero.y -= hero.speed;
+        }
     }
-    if(keys.dkd && hero.y < 650-hero.height){
-        hero.y+=hero.speed;
+    if(keys.dkd && hero.y < 600-hero.height){
+        var collisionDetected = false;
+        hero.nextY=hero.y+hero.speed;
+        hero.nextX=hero.x;
+        for(i=0; i<blocks.length; i++){
+            if(predictHit(hero, blocks[i])){
+                collisionDetected=true;
+                break;
+            }
+        }
+        if(!collisionDetected) {
+            hero.y += hero.speed;
+        }
     }
 }
 
@@ -398,5 +459,4 @@ function tock(e){
     stage2.update(e);
     //console.log("Tock is running");
     spinner.rotation +=1;
-
 }
