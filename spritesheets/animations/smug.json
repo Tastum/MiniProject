@@ -1,5 +1,5 @@
 {
-  "framerate": 8,
+  "framerate": 5,
   "images": ["img/smug.png"],
   "frames": {"width":100, "height":50, "regX":0, "regY":0},
   "animations": {
