@@ -3,7 +3,7 @@ var gameIsRunning = false;
 var stage, stage2;
 var hero;
 var life = 3;
-var level = 1;
+var level = 10;
 var gameTime = 60;
 var co2Niveau = 0;
 var co2Increase = .1;
@@ -19,6 +19,7 @@ var heroSpriteSheet;
 //var grid;
 var hitTest;
 var smug, statusNow, co2Container;
+var smogCloudsRight = [], smogCloudsLeft = [];
 
 var keys = {
     rkd:false,
@@ -30,6 +31,9 @@ var keys = {
 function init(){
     stage = new createjs.Stage("canvas");
     stage2 = new createjs.Stage("canvasInfo");
+
+    addSmogCloudsRight();
+    addSmogCloudsLeft();
 
     preloadText = new createjs.Text("", "50px Arial", "#000");
     preloadText.textBaseline="middle";
@@ -468,6 +472,59 @@ function moveHero(){
     }
 }
 
+function addSmogCloudsRight() {
+    var i;
+    for(i=0; i<level; i=level) {
+        var temp = new createjs.Bitmap("img/smogCloud.png");
+        temp.width = 120;
+        temp.height = 100;
+        stage.addChild(temp);
+        temp.y = Math.floor(Math.random() * 500);
+        temp.x = 800+temp.width;
+        smogCloudsRight.push(temp);
+    }
+}
+
+function addSmogCloudsLeft() {
+    var i;
+    for(i=0; i<level; i=level) {
+        var temp = new createjs.Bitmap("img/smogCloud.png");
+        temp.width = 120;
+        temp.height = 100;
+        stage.addChild(temp);
+        temp.y = Math.floor(Math.random() * 500);
+        temp.x = 800+temp.width;
+        smogCloudsLeft.push(temp);
+    }
+}
+
+function moveSmogCloudsRight(){
+    var i;
+    var length = smogCloudsRight.length-1;
+    for(i=length; i>=0; i--){
+        smogCloudsRight[i].x+= level/2;
+        smogCloudsRight[i].y+= 0.2;
+        if(smogCloudsRight[i].x > 800 || smogCloudsRight[i].y < -120 || smogCloudsRight[i].y > 650){
+            smogCloudsRight[i].x = - Math.random() * 500;
+            smogCloudsRight[i].y = Math.floor(Math.random() * 500);
+        }
+    }
+}
+
+function moveSmogCloudsLeft(){
+    var i;
+    var length = smogCloudsLeft.length-1;
+    for(i=length; i>=0; i--){
+        smogCloudsLeft[i].x-= level/2;
+        smogCloudsLeft[i].y+= 0.2;
+        if(smogCloudsLeft[i].x < -50 || smogCloudsLeft[i].y <-120 || smogCloudsLeft[i].y > 650){
+            smogCloudsLeft[i].x = 800 + Math.random() * 500;
+            smogCloudsLeft[i].y = Math.floor(Math.random() * 500);
+        }
+    }
+}
+
+
 //Endnu ikke i brug
 function muteButton() {
     muteButton = new createjs.Shape();
@@ -487,6 +544,9 @@ function muteButton() {
 
 }
     function tock(e) {
+        moveSmogCloudsRight();
+        moveSmogCloudsLeft();
+
         if (co2Niveau > 400) {
             gameIsRunning = false;
             gameOver();
@@ -501,6 +561,8 @@ function muteButton() {
         if (gameIsRunning === true) {
             moveHero();
             statusBar();
+            moveSmogCloudsRight();
+            moveSmogCloudsLeft();
             co2Niveau += co2Increase;
             gameTimeText.text = "Time left: " + +Math.round(gameTime) + " sec";
         }
