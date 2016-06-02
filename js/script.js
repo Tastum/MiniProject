@@ -1,12 +1,12 @@
 var autoStart = true;
 var gameIsRunning = false;
-var stage;
+var stage, stage2;
 var hero;
-var life
+var life = 3;
 var level = 1;
 var time
 var co2Niveau = 0
-var preloadText
+var preloadText, infoText;
 var muteButton;
 var levelData;
 var tiles;
@@ -15,6 +15,9 @@ var queue;
 var blockSize = 50;
 var spinner;
 var heroSpriteSheet;
+var grid;
+var smug;
+
 
 var keys = {
     rkd:false,
@@ -25,8 +28,9 @@ var keys = {
 
 function init(){
     stage = new createjs.Stage("canvas");
-    preloadText = new createjs.Text("", "50px Arial", "#000");
+    stage2 = new createjs.Stage("canvasInfo");
 
+    preloadText = new createjs.Text("", "50px Arial", "#000");
     preloadText.textBaseline="middle";
     preloadText.textAlign="center";
     preloadText.x=stage.canvas.width/2;
@@ -51,8 +55,11 @@ function preload(){
     queue.loadManifest([
         {id: "heroSsBoy", src:"spritesheets/animations/heroSsBoy.json"},
         {id: "heroSsGirl", src:"spritesheets/animations/heroSsGirl.json"},
+        {id: "smug", src:"spritesheets/animations/smug.json"},
         "spritesheets/animations/hero-boy-sheet.png",
         "spritesheets/animations/hero-girl-sheet.png",
+        "img/factory.png",
+        "img/smug.png",
         {id:"levelJson",src:"json/levels.json"},
         {id:"bgSound", src:"sounds/bass.mp3"},
         {id:"tiles",src:"json/tiles.json"}
@@ -66,7 +73,7 @@ function queueProgress(e){
 }
 
 function queueComplete(){
-    createjs.Ticker.addEventListener("tick", tock);
+    createjs.Ticker.on("tick", tock);
     createjs.Ticker.setFPS(30);
     stage.removeChild(preloadText);
 
@@ -90,17 +97,31 @@ function queueComplete(){
     );
     stage.addChild(splash);
 
-}
 
+
+}
+function isPassable(r, c){
+    switch(grid[r][c].type){
+        case 0:
+            return true;
+            break;
+        case 1:
+            return false;
+            break;
+    }
+}
 function setupLevel(){
+    //stage.removeAllChildren();
     var row, col;
     currentLevel++;
     var level = levelData.levels[currentLevel].tiles;
     //console.log(level);
+    grid=[];
     for(row=0; row<level.length; row++){
+        grid.push([]);
         //console.log(level[row]);
         for(col=0; col<level[row].length; col++){
-          console.log(level[row].length)
+          //console.log(level[row].length)
             var img;
             switch(level[row][col]){
                 case 0:
@@ -121,6 +142,10 @@ function setupLevel(){
             var t = new createjs.Sprite(tiles, img);
             t.x=col*blockSize;
             t.y=row*blockSize;
+            t.row = row;
+            t.col = col;
+            t.type = level[row][col];
+            grid[row].push(t);
             stage.addChild(t);
         }
     }
@@ -183,7 +208,44 @@ function fingerDown(e){
     }
 }
 
+function hitTest(rect1,rect2) {
+    if ( rect1.x >= rect2.x + rect2.width
+        || rect1.x + rect1.width <= rect2.x
+        || rect1.y >= rect2.y + rect2.height
+        || rect1.y + rect1.height <= rect2.y )
+    {
+        return false;
+    }
+    return true;
+}
+
+function checkCollisions(){
+
+    var i=0;
+    for(; i<level; i++){
+        if(hitTest(astronaut, aliens1[i])){
+            gameIsRunning = false;
+            dead();
+        }
+        if(hitTest(astronaut, aliens2[i])){
+            gameIsRunning = false;
+            dead();
+        }
+        if(hitTest(astronaut, meteors1[i])){
+            gameIsRunning = false;
+            dead();
+        }
+        if(hitTest(astronaut, meteors2[i])){
+            gameIsRunning = false;
+            dead();
+        }
+    }
+}
+
 function selectHeroType(){
+
+
+
 
     var boy = new createjs.Bitmap("img/boyHero.png");
     boy.x=100;
@@ -194,6 +256,8 @@ function selectHeroType(){
             gameIsRunning=true;
             setupLevel();
             addHero('boy');
+            addInfoBar();
+            //stage.removeChild('Infotext');
         }
     );
 
@@ -206,6 +270,8 @@ function selectHeroType(){
             gameIsRunning=true;
             setupLevel();
             addHero('girl');
+            addInfoBar();
+            //stage.removeChild('Infotext');
         }
     );
 
@@ -217,6 +283,21 @@ function startGame(){
 }
 
 function resetGame(){
+
+}
+
+function addInfoBar() {
+    var factory = new createjs.Bitmap("img/factory.png");
+    factory.x=10;
+    factory.y=0;
+    stage2.addChild(factory);
+
+    var smugSheet = new createjs.SpriteSheet(queue.getResult('spritesheets/animations/smug.json'));
+    smug = new createjs.Sprite(smugSheet, 'run');
+    smug.x = 100;
+    smug.y = 0;
+
+    stage2.addChild(smug);
 
 }
 
@@ -232,6 +313,10 @@ function addHero(gender) {
     hero.width = 50;
     hero.height = 100;
     hero.speed = 12;
+    /*if(isPassable(hero.width, hero.height)){
+        hero.x=hero.width*blockSize;
+        hero.y=hero.height*blockSize;
+    }*/
     hero.x = (stage.canvas.width / 2) - (hero.width / 2);
     hero.y = stage.canvas.height - hero.height;
     stage.addChild(hero); //Her stod den oprindeligt!
@@ -279,6 +364,7 @@ function tock(e){
         moveHero();
     }
     stage.update(e);
+    stage2.update(e);
     //console.log("Tock is running");
     spinner.rotation +=1;
 }

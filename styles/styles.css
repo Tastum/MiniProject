@@ -11,3 +11,10 @@ body {
     border: 2px solid #000;
     background-image: url("../img/startBg.jpg");
 }
+
+#canvasInfo {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    border: 2px solid #000;
+    background-color: #ffffff;
+}
