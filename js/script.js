@@ -19,6 +19,7 @@ var heroSpriteSheet;
 //var grid;
 var hitTest;
 var smug, statusNow, co2Container;
+var t;
 
 var keys = {
     rkd:false,
@@ -114,10 +115,18 @@ function queueComplete(){
 
 }
 
+function addSun(){
+    var temp = new createjs.Bitmap("img/sun.png");
+    temp.width = 20;
+    temp.height = 20;
+    stage.addChild(temp);
+}
+
 function nextLevel() {
     co2Niveau = 0;
     co2Increase +=.2;
     setupLevel();
+    addHero();
 }
 
 function setupLevel(){
@@ -148,7 +157,7 @@ function setupLevel(){
                     img = "windmill";
                     break;
             }
-            var t = new createjs.Sprite(tiles, img);
+            t = new createjs.Sprite(tiles, img);
             t.x=col*blockSize;
             t.y=row*blockSize;
             t.width=blockSize;
