@@ -68,7 +68,10 @@ function preload(){
         "img/factory.png",
         "img/smug.png",
         {id:"levelJson",src:"json/levels.json"},
-        {id:"bgSound", src:"sounds/bass.mp3"},
+        {id:"bgSound", src:"sounds/bg.mp3"},
+        {id:"pickUp", src:"sounds/ding.mp3"},
+        {id:"pickDown", src:"sounds/dong.mp3"},
+        {id:"pickDead", src:"sounds/dead.mp3"},
         {id:"tiles",src:"json/tiles.json"}
     ])
     console.log("Preload")
@@ -98,6 +101,7 @@ function queueComplete(){
     splash.addEventListener('click',
         function(e){
             createjs.Sound.play('bgSound', {loop:-1});
+
             stage.removeChild(e.target);
             stage.removeChild(introText);
             stage2.removeChild(title);
@@ -295,6 +299,7 @@ function windmillHit() {
                 if (windScore >0) {
                     minusCo2();
                     windScore--;
+                    createjs.Sound.play('pickDown');
                 }
         }
 
@@ -309,6 +314,7 @@ function solarHit() {
             if (sunScore >0) {
                 minusCo2();
                 sunScore--;
+                createjs.Sound.play('pickDown');
             }
 
         }
@@ -325,6 +331,7 @@ for (i=0; i<suns.length; i++) {
         stage.removeChild(suns[i]);
         suns.splice(i, 1);
         sunScore++;
+        createjs.Sound.play('pickUp');
     }
 }
 }
@@ -336,6 +343,7 @@ function windHit(){
         stage.removeChild(winds[i]);
         winds.splice(i, 1);
         windScore++;
+            createjs.Sound.play('pickUp');
         }
     }
 }
@@ -458,17 +466,18 @@ function statusBar() {
 
 function minusCo2() {
     co2Niveau -=20;
-    stage2.removeChild(statusNow);
+    //stage2.removeChild(statusNow);
 }
 
 function runGame() {
     gameIsRunning=true;
     setupLevel();
     addInfoBar();
-    addSmogCloudsRight();
-    addSmogCloudsLeft();
+
     addWindmill();
     addSolar();
+    addSmogCloudsRight();
+    addSmogCloudsLeft();
 
     var pollutionText = new createjs.Text("", "20px Arial", "#000");
     pollutionText.text = "Pollution";
@@ -502,6 +511,7 @@ function gameOver() {
     deadText.text = "You're Dead!";
     deadText.x = 230;
     deadText.y = 130;
+
 
 
     var splash = new createjs.Bitmap("img/replay.png");
@@ -665,12 +675,13 @@ function checkCollisions(){
             //console.log("Left Hit")
             life --;
             smogCloudsLeft[i].x=+1000;
-
+            createjs.Sound.play('pickDead');
         }
         if(hitTest(hero, smogCloudsRight[i])){
             //console.log("Right Hit")
             life --;
             smogCloudsRight[i].x=-200;
+            createjs.Sound.play('pickDead');
         }
     }
 }
