@@ -3,11 +3,13 @@ var gameIsRunning = false;
 var stage, stage2;
 var hero;
 var life = 3;
+var wind = 0;
+var sun = 0;
 var level = 1;
-var gameTime = 60;
+var gameTime = 1;
 var co2Niveau = 0;
 var co2Increase = .1;
-var preloadText, selectText, deadText;
+var preloadText, deadText;
 var muteButton;
 var levelData;
 var tiles;
@@ -17,7 +19,7 @@ var blockSize = 50;
 var spinner;
 var heroSpriteSheet;
 //var grid;
-var hitTest;
+//var hitTest;
 var smug, statusNow, co2Container;
 var smogCloudsRight = [], smogCloudsLeft = [];
 var t;
@@ -32,9 +34,6 @@ var keys = {
 function init(){
     stage = new createjs.Stage("canvas");
     stage2 = new createjs.Stage("canvasInfo");
-
-    addSmogCloudsRight();
-    addSmogCloudsLeft();
 
     preloadText = new createjs.Text("", "50px Arial", "#000");
     preloadText.textBaseline="middle";
@@ -131,6 +130,8 @@ function nextLevel() {
     co2Increase +=.2;
     setupLevel();
     addHero();
+    level++;
+    smogCloudsRight.splice();
 }
 
 function setupLevel(){
@@ -231,16 +232,7 @@ function fingerDown(e){
     }
 }
 
-function hitTest(rect1,rect2) {
-    if ( rect1.x >= rect2.x + rect2.width
-        || rect1.x + rect1.width <= rect2.x
-        || rect1.y >= rect2.y + rect2.height
-        || rect1.y + rect1.height <= rect2.y )
-    {
-        return false;
-    }
-    return true;
-}
+
 
 function predictHit(character,rect2) {
     if ( character.nextX >= rect2.x + rect2.width
@@ -327,14 +319,28 @@ function addInfoBar() {
 
     var windScore = new createjs.Bitmap("img/wind.png");
     windScore.x = 680;
-    windScore.y = 30;
+    windScore.y = 40;
     stage2.addChild(windScore);
 
     var sunScore = new createjs.Bitmap("img/sun.png");
     sunScore.x = 700;
-    sunScore.y = 50;
+    sunScore.y = 70;
     stage2.addChild(sunScore);
 
+    lifeText = new createjs.Text("", "18px Arial", "#000");
+    lifeText.x = 750;
+    lifeText.y = 10;
+    stage2.addChild(lifeText);
+
+    windText = new createjs.Text("", "18px Arial", "#000");
+    windText.x = 750;
+    windText.y = 40;
+    stage2.addChild(windText);
+
+    sunText = new createjs.Text("", "18px Arial", "#000");
+    sunText.x = 750;
+    sunText.y = 70;
+    stage2.addChild(sunText);
 
     statusBar();
 }
@@ -346,12 +352,16 @@ function statusBar() {
 
 function minusCo2() {
     co2Niveau -=20;
+    stage2.removeChild(statusNow);
 }
 
 function runGame() {
     gameIsRunning=true;
+
     setupLevel();
     addInfoBar();
+    addSmogCloudsRight();
+    addSmogCloudsLeft();
 
     var pollutionText = new createjs.Text("", "20px Arial", "#000");
     pollutionText.text = "Pollution";
@@ -360,19 +370,21 @@ function runGame() {
     stage2.addChild(pollutionText);
 
     gameTimeText = new createjs.Text("", "18px Arial", "#000");
-    gameTimeText.text = "Time left: " + gameTime + " sek";
     gameTimeText.x = 450;
     gameTimeText.y = 75;
     stage2.addChild(gameTimeText);
 }
 
 function youWin() {
+
     var youWinText = new createjs.Text("", "60px Arial", "#000");
     youWinText.text = "Level up!";
     youWinText.x = 280;
     youWinText.y = 230;
     gameTime = 60;
     stage.addChild(youWinText);
+    stage2.removeChild(gameTimeText, sunText, windText, lifeText, smug);
+
 
     setTimeout(function() { nextLevel(); }, 2000);
 }
@@ -394,12 +406,13 @@ function gameOver() {
         }
     );
     stage.addChild(deadText, splash);
+    stage.removeChild(hero, smogCloudsLeft, smogCloudsRight);
 
 
 }
 
 function addHero(gender) {
-    runGame();
+
     if (gender === 'boy'){
         heroSpriteSheet = new createjs.SpriteSheet(queue.getResult('spritesheets/animations/heroSsBoy.json'));
         hero = new createjs.Sprite(heroSpriteSheet, 'still');
@@ -416,9 +429,13 @@ function addHero(gender) {
     //hero.sun = 0;
     //hero.wind = 0;
 
+    runGame();
+
     hero.x = (stage.canvas.width / 2) - (hero.width / 2);
     hero.y = stage.canvas.height - hero.height;
     stage.addChild(hero); //Her stod den oprindeligt!
+
+
 }
 
 function moveHero(){
@@ -428,7 +445,6 @@ function moveHero(){
         hero.nextX=hero.x+hero.speed;
         for(i=0; i<blocks.length; i++){
             if(predictHit(hero, blocks[i])){
-                console.log("hit predicted");
                 collisionDetected=true;
                 break;
             }
@@ -513,7 +529,7 @@ function moveSmogCloudsRight(){
     for(i=length; i>=0; i--){
         smogCloudsRight[i].x+= level/2;
         smogCloudsRight[i].y+= 0.2;
-        if(smogCloudsRight[i].x > 800 || smogCloudsRight[i].y < -120 || smogCloudsRight[i].y > 650){
+        if(smogCloudsRight[i].x > 800 || smogCloudsRight[i].y < -120 || smogCloudsRight[i].y > 700){
             smogCloudsRight[i].x = - Math.random() * 500;
             smogCloudsRight[i].y = Math.floor(Math.random() * 500);
         }
@@ -526,14 +542,48 @@ function moveSmogCloudsLeft(){
     for(i=length; i>=0; i--){
         smogCloudsLeft[i].x-= level/2;
         smogCloudsLeft[i].y+= 0.2;
-        if(smogCloudsLeft[i].x < -50 || smogCloudsLeft[i].y <-120 || smogCloudsLeft[i].y > 650){
+        if(smogCloudsLeft[i].x < -120 || smogCloudsLeft[i].y <-120 || smogCloudsLeft[i].y > 700){
             smogCloudsLeft[i].x = 800 + Math.random() * 500;
             smogCloudsLeft[i].y = Math.floor(Math.random() * 500);
         }
     }
 }
 
+function hitTest(rect1,rect2) {
+    if ( rect1.x >= rect2.x + rect2.width
+        || rect1.x + rect1.width <= rect2.x
+        || rect1.y >= rect2.y + rect2.height
+        || rect1.y + rect1.height <= rect2.y )
+    {
+        return false;
+    }
+    return true;
+}
 
+function checkCollisions(){
+
+    var i=0;
+    for(; i<level; i++){
+
+        if(hitTest(hero, smogCloudsLeft[i])){
+            //console.log("Left Hit")
+            life --;
+            smogCloudsLeft[i].x=+1000;
+
+        }
+        if(hitTest(hero, smogCloudsRight[i])){
+            //console.log("Right Hit")
+            life --;
+            smogCloudsRight[i].x=-200;
+        }
+    }
+}
+
+function lifestatus() {
+    if (life <= 0){
+        gameOver();
+    }
+}
 //Endnu ikke i brug
 function muteButton() {
     muteButton = new createjs.Shape();
@@ -563,7 +613,7 @@ function muteButton() {
         if (gameIsRunning === true)
             if (gameTime > 0) {
                 gameTime -= .025;
-
+                spinner.rotation += 1;
             } else {
                 youWin();
             }
@@ -572,8 +622,14 @@ function muteButton() {
             statusBar();
             moveSmogCloudsRight();
             moveSmogCloudsLeft();
+            checkCollisions();
+            lifestatus();
             co2Niveau += co2Increase;
             gameTimeText.text = "Time left: " + +Math.round(gameTime) + " sec";
+            lifeText.text = life;
+            windText.text = wind;
+            sunText.text = sun;
+
         }
         stage.update(e);
         stage2.update(e);
